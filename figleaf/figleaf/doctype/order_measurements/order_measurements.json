@@ -1,0 +1,113 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2024-12-26 15:27:18.331799",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "document_type",
+  "item",
+  "column_break_lymf",
+  "ref_no",
+  "quantity",
+  "column_break_tefi",
+  "date",
+  "naming_series",
+  "section_break_tduq",
+  "measurement_template",
+  "measurement_details",
+  "remark"
+ ],
+ "fields": [
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "label": "Document Type",
+   "link_filters": "[[\"DocType\",\"name\",\"in\",[\"Opportunity\",\"Sales Order\"]]]",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "ref_no",
+   "fieldtype": "Dynamic Link",
+   "label": "Ref No",
+   "options": "document_type"
+  },
+  {
+   "fieldname": "column_break_lymf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_tefi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "section_break_tduq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "measurement_details",
+   "fieldtype": "Table",
+   "label": "Measurement Details",
+   "options": "Measurement Details"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "quantity",
+   "fieldtype": "Int",
+   "label": "Quantity"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "Remark"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "series"
+  },
+  {
+   "fieldname": "measurement_template",
+   "fieldtype": "Link",
+   "label": "Measurement Template",
+   "options": "Measurement Template"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-12-26 15:43:22.009701",
+ "modified_by": "Administrator",
+ "module": "Figleaf",
+ "name": "Order Measurements",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

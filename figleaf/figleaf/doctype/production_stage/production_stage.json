@@ -1,0 +1,125 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-12-26 16:04:37.590178",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_7yqe",
+  "production_order",
+  "item",
+  "start_time",
+  "end_time",
+  "column_break_meig",
+  "status",
+  "stage",
+  "amended_from",
+  "quantity_completed",
+  "total_quanity_to_manufacture",
+  "section_break_qpwd",
+  "tailor_logs"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_7yqe",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Production Stage",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "production_order",
+   "fieldtype": "Link",
+   "label": "Production Order",
+   "options": "Work Order"
+  },
+  {
+   "fieldname": "column_break_meig",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stage",
+   "fieldtype": "Link",
+   "label": "Stage",
+   "options": "Stage"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Not Started\nProgress\nCompleted"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "label": "End Time"
+  },
+  {
+   "fieldname": "quantity_completed",
+   "fieldtype": "Float",
+   "label": "Quantity Completed"
+  },
+  {
+   "fieldname": "section_break_qpwd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "tailor_logs",
+   "fieldtype": "Table",
+   "label": "Tailor Logs",
+   "options": "Tailor Performance Log"
+  },
+  {
+   "fetch_from": "production_order.production_item",
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "production_order.qty",
+   "fieldname": "total_quanity_to_manufacture",
+   "fieldtype": "Float",
+   "label": "Total Quanity to Manufacture"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-01-01 17:09:24.841440",
+ "modified_by": "Administrator",
+ "module": "Figleaf",
+ "name": "Production Stage",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

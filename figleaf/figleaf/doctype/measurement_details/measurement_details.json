@@ -1,0 +1,52 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-12-26 15:33:28.593013",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "measurement_type",
+  "measurement_value",
+  "column_break_rfpm",
+  "additional_notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "measurement_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Measurement Type",
+   "options": "Measurement Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "additional_notes",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Additional Notes"
+  },
+  {
+   "fieldname": "column_break_rfpm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "measurement_value",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Measurement Value"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-12-26 15:46:11.336062",
+ "modified_by": "Administrator",
+ "module": "Figleaf",
+ "name": "Measurement Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
