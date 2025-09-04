@@ -6,20 +6,49 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "customer",
+  "customer_name",
+  "gender",
+  "column_break_customer",
   "document_type",
+  "ref_no",
   "item",
   "column_break_lymf",
-  "ref_no",
   "quantity",
-  "column_break_tefi",
   "date",
   "naming_series",
   "section_break_tduq",
   "measurement_template",
   "measurement_details",
+  "section_break_remarks",
   "remark"
  ],
  "fields": [
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "reqd": 1
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "fetch_from": "customer.customer_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "label": "Gender",
+   "options": "\nMale\nFemale\nUnisex",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_customer",
+   "fieldtype": "Column Break"
+  },
   {
    "fieldname": "document_type",
    "fieldtype": "Link",
@@ -66,6 +95,11 @@
    "fieldname": "quantity",
    "fieldtype": "Int",
    "label": "Quantity"
+  },
+  {
+   "fieldname": "section_break_remarks",
+   "fieldtype": "Section Break",
+   "label": "Additional Information"
   },
   {
    "fieldname": "remark",

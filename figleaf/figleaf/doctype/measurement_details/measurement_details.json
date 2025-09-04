@@ -8,6 +8,7 @@
  "field_order": [
   "measurement_type",
   "measurement_value",
+  "unit",
   "column_break_rfpm",
   "additional_notes"
  ],
@@ -32,9 +33,19 @@
   },
   {
    "fieldname": "measurement_value",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Measurement Value"
+   "label": "Measurement Value",
+   "precision": "2"
+  },
+  {
+   "fieldname": "unit",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Unit",
+   "options": "inch\ncm\nmm",
+   "default": "inch",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,

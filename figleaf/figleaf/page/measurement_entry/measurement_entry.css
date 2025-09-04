@@ -1,0 +1,127 @@
+.measurement-entry-container {
+    padding: 15px;
+}
+
+.measurement-form .card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.measurement-form .card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.measurement-form .card-header {
+    border-radius: 8px 8px 0 0 !important;
+    padding: 12px 20px;
+    font-weight: 500;
+}
+
+.measurement-form .card-body {
+    padding: 20px;
+}
+
+.measurements-grid {
+    overflow-x: auto;
+}
+
+.measurements-grid table {
+    margin-bottom: 0;
+}
+
+.measurements-grid thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    padding: 10px;
+}
+
+.measurement-row:hover {
+    background-color: #f8f9fa;
+}
+
+.measurement-row td {
+    vertical-align: middle;
+    padding: 8px;
+}
+
+.remove-row {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    line-height: 1;
+    border-radius: 50%;
+}
+
+.apply-template,
+.copy-last-measurements {
+    height: 38px;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+.customer-section .card-header {
+    background-color: #007bff !important;
+}
+
+.order-section .card-header {
+    background-color: #17a2b8 !important;
+}
+
+.template-section .card-header {
+    background-color: #28a745 !important;
+}
+
+.measurements-section .card-header {
+    background-color: #6c757d !important;
+}
+
+.remarks-section .card-header {
+    background-color: #343a40 !important;
+}
+
+@media (max-width: 768px) {
+    .measurement-form .row {
+        margin: 0;
+    }
+    
+    .measurement-form .col-md-3,
+    .measurement-form .col-md-4,
+    .measurement-form .col-md-6 {
+        padding-left: 0;
+        padding-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .measurements-grid {
+        font-size: 14px;
+    }
+}
+
+.measurement-type,
+.measurement-unit {
+    min-width: 120px;
+}
+
+.measurement-value {
+    min-width: 80px;
+}
+
+.measurement-notes {
+    min-width: 150px;
+}
+
+.add-measurement {
+    white-space: nowrap;
+}
+
+.default-unit {
+    background-color: white;
+    border: 1px solid #ced4da;
+}
