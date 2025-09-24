@@ -41,11 +41,12 @@ app_license = "agpl-3.0"
 
 # include js in page
 # page_js = {"page" : "public/js/file.js"}
-
+"figleaf/overrides/quotation/custom_quotation.js"
 # include js in doctype views
 doctype_js = {
     "Opportunity": "public/js/opportunity.js",
-    "Order Measurements": "public/js/order_measurements.js"
+    "Order Measurements": "public/js/order_measurements.js",
+    "Quotation": "overrides/quotation/custom_quotation.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -132,9 +133,10 @@ doctype_js = {
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
+override_doctype_class = {
 # 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+	"Quotation": "figleaf.overrides.quotation.custom_quotation.CustomQuotation"
+}
 
 # Document Events
 # ---------------
