@@ -168,6 +168,7 @@ frappe.ui.form.on('Quotation', {
                         frm.call("quotation_update", updated_quotation_items).then(r => {
                             if (r.message == "success") {
                                 dialog.hide()
+                                frm.reload_doc()
                             }
                         })
                     }, () => {
