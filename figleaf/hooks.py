@@ -135,7 +135,9 @@ doctype_js = {
 
 override_doctype_class = {
 # 	"ToDo": "custom_app.overrides.CustomToDo"
-	"Quotation": "figleaf.overrides.quotation.custom_quotation.CustomQuotation"
+	"Quotation": "figleaf.overrides.quotation.custom_quotation.CustomQuotation",
+    "Contact": "figleaf.overrides.contact.custom_contact.CustomContact",
+    "Employee": "figleaf.overrides.employee.custom_employee.CustomEmployee",
 }
 
 # Document Events
