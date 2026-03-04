@@ -7,9 +7,7 @@ from frappe.utils import flt
 
 
 def execute(filters=None):
-	if not filters:
-		return [], []
-
+	filters = filters or {}
 	columns = get_columns(filters)
 	data = get_data(filters)
 
