@@ -46,5 +46,31 @@ frappe.query_reports["Sales Order Status Tracker"] = {
 			fieldtype: "Link",
 			options: "Sales Person"
 		}
-	]
+	],
+
+	formatter: function(value, row, column, data, default_formatter) {
+		value = default_formatter(value, row, column, data);
+
+		if (column.fieldname === "order_status" && data) {
+			if (data.order_status === "Completed") {
+				value = "<span style='color:green;font-weight:bold'>" + value + "</span>";
+			} else if (data.order_status === "To Deliver and Bill") {
+				value = "<span style='color:orange'>" + value + "</span>";
+			} else if (data.order_status === "Cancelled" || data.order_status === "Closed") {
+				value = "<span style='color:red'>" + value + "</span>";
+			}
+		}
+
+		if (column.fieldname === "work_order_status" && data && data.work_order_status) {
+			if (data.work_order_status === "Completed") {
+				value = "<span style='color:green;font-weight:bold'>" + value + "</span>";
+			} else if (data.work_order_status === "In Process") {
+				value = "<span style='color:blue'>" + value + "</span>";
+			} else if (data.work_order_status === "Not Started") {
+				value = "<span style='color:orange'>" + value + "</span>";
+			}
+		}
+
+		return value;
+	}
 };
