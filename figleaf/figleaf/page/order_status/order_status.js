@@ -13,6 +13,7 @@ class OrderStatus {
 		this.page = page;
 		this.data = [];
 		this.selected_order = null;
+		this.active_stat_filter = null;
 		this.refresh_interval = null;
 		this.make();
 		this.setup_filters().then(() => {
@@ -27,6 +28,7 @@ class OrderStatus {
 				<div class="order-status-filters">
 					<div class="filter-row"></div>
 				</div>
+				<div class="order-status-summary"></div>
 				<div class="order-status-body">
 					<div class="order-list-sidebar">
 						<div class="sidebar-title">Orders</div>
@@ -106,6 +108,7 @@ class OrderStatus {
 			args: { filters },
 			callback: (r) => {
 				this.data = r.message || [];
+				this.render_summary();
 				this.render_sidebar();
 				this.render_cards();
 			}
@@ -149,20 +152,150 @@ class OrderStatus {
 				} else {
 					this.selected_order = order.name;
 				}
+				this.active_stat_filter = null;
+				this.render_summary();
 				this.render_sidebar();
 				this.render_cards();
 			});
 		});
 	}
 
+	render_summary() {
+		let $summary = this.page.main.find('.order-status-summary');
+		$summary.empty();
+
+		let data = this.data;
+		if (!data.length) return;
+
+		// Key numbers
+		let unique_orders = new Set(data.map(r => r.sales_order)).size;
+		let total_items = data.length;
+		let total_qty = data.reduce((s, r) => s + (r.qty || 0), 0);
+		let delivered_items = data.filter(r => r.is_delivered).length;
+		let billed_items = data.filter(r => r.is_billed).length;
+		let overdue_items = data.filter(r => r.delay_days > 0 && !r.is_delivered);
+		let overdue_count = overdue_items.length;
+
+		let delays = data.filter(r => r.delay_days !== null && r.delay_days !== undefined && !r.is_delivered && r.delay_days > 0);
+		let avg_delay = delays.length ? (delays.reduce((s, r) => s + r.delay_days, 0) / delays.length).toFixed(1) : 0;
+
+		let on_time_delivered = data.filter(r => r.is_delivered && r.delay_days !== null && r.delay_days <= 0).length;
+		let total_delivered = delivered_items;
+		let on_time_pct = total_delivered > 0 ? Math.round((on_time_delivered / total_delivered) * 100) : '-';
+
+		// In production
+		let in_production = data.filter(r => r.work_order && r.work_order_status !== 'Completed').length;
+
+		// Stage pipeline counts
+		let stage_counts = {};
+		data.forEach(row => {
+			if (!row.stages) return;
+			row.stages.forEach(stage => {
+				if (stage.label === 'Ordered' || stage.label === 'Delivered' || stage.label === 'Billed') return;
+				if (!stage_counts[stage.label]) {
+					stage_counts[stage.label] = { in_progress: 0, completed: 0, pending: 0 };
+				}
+				stage_counts[stage.label][stage.status === 'in-progress' ? 'in_progress' : stage.status]++;
+			});
+		});
+
+		// Row 1: Key numbers
+		let row1_cards = [
+			{ key: 'total_orders', label: 'Total Orders', value: unique_orders, color: 'blue' },
+			{ key: 'total_items', label: 'Total Items', value: total_items, sub: `Qty: ${total_qty}`, color: 'blue' },
+			{ key: 'in_production', label: 'In Production', value: in_production, color: 'orange' },
+			{ key: 'delivered', label: 'Delivered', value: `${delivered_items} / ${total_items}`, color: 'green' },
+			{ key: 'billed', label: 'Billed', value: `${billed_items} / ${total_items}`, color: 'purple' },
+			{ key: 'overdue', label: 'Overdue', value: overdue_count, color: overdue_count > 0 ? 'red' : 'green' },
+			{ key: 'avg_delay', label: 'Avg Delay', value: avg_delay > 0 ? `${avg_delay}d` : '-', color: avg_delay > 0 ? 'red' : 'green' },
+			{ key: 'on_time', label: 'On Time %', value: on_time_pct === '-' ? '-' : `${on_time_pct}%`, color: 'green' },
+		];
+
+		let row1_html = '<div class="summary-row">';
+		row1_cards.forEach(card => {
+			let active = this.active_stat_filter === card.key ? 'active' : '';
+			let clickable = ['in_production', 'delivered', 'billed', 'overdue'].includes(card.key) ? 'clickable' : '';
+			row1_html += `
+				<div class="summary-card ${card.color} ${active} ${clickable}" data-stat="${card.key}">
+					<div class="summary-value">${card.value}</div>
+					<div class="summary-label">${card.label}</div>
+					${card.sub ? `<div class="summary-sub">${card.sub}</div>` : ''}
+				</div>`;
+		});
+		row1_html += '</div>';
+
+		// Row 2: Pipeline stage counts
+		let stage_names = Object.keys(stage_counts);
+		let row2_html = '';
+		if (stage_names.length) {
+			row2_html = '<div class="summary-row pipeline-row">';
+			stage_names.forEach(name => {
+				let c = stage_counts[name];
+				let active = this.active_stat_filter === `stage:${name}` ? 'active' : '';
+				row2_html += `
+					<div class="summary-card pipeline-card clickable ${active}" data-stat="stage:${name}">
+						<div class="summary-label">${name}</div>
+						<div class="pipeline-counts">
+							${c.in_progress > 0 ? `<span class="pipeline-badge orange">${c.in_progress} active</span>` : ''}
+							${c.completed > 0 ? `<span class="pipeline-badge green">${c.completed} done</span>` : ''}
+							${c.pending > 0 ? `<span class="pipeline-badge gray">${c.pending} pending</span>` : ''}
+						</div>
+					</div>`;
+			});
+			row2_html += '</div>';
+		}
+
+		$summary.html(row1_html + row2_html);
+
+		// Click handlers for stat cards
+		$summary.find('.summary-card.clickable').on('click', (e) => {
+			let key = $(e.currentTarget).data('stat');
+			if (this.active_stat_filter === key) {
+				this.active_stat_filter = null;
+			} else {
+				this.active_stat_filter = key;
+			}
+			this.selected_order = null;
+			this.render_summary();
+			this.render_sidebar();
+			this.render_cards();
+		});
+	}
+
+	get_filtered_data() {
+		let data = this.data;
+
+		if (this.selected_order) {
+			data = data.filter(r => r.sales_order === this.selected_order);
+		}
+
+		if (this.active_stat_filter) {
+			let f = this.active_stat_filter;
+			if (f === 'in_production') {
+				data = data.filter(r => r.work_order && r.work_order_status !== 'Completed');
+			} else if (f === 'delivered') {
+				data = data.filter(r => r.is_delivered);
+			} else if (f === 'billed') {
+				data = data.filter(r => r.is_billed);
+			} else if (f === 'overdue') {
+				data = data.filter(r => r.delay_days > 0 && !r.is_delivered);
+			} else if (f.startsWith('stage:')) {
+				let stage_name = f.replace('stage:', '');
+				data = data.filter(r => {
+					if (!r.stages) return false;
+					return r.stages.some(s => s.label === stage_name && s.status === 'in-progress');
+				});
+			}
+		}
+
+		return data;
+	}
+
 	render_cards() {
 		let area = this.page.main.find('.order-cards-area');
 		area.empty();
 
-		let filtered_data = this.data;
-		if (this.selected_order) {
-			filtered_data = this.data.filter(r => r.sales_order === this.selected_order);
-		}
+		let filtered_data = this.get_filtered_data();
 
 		if (filtered_data.length === 0) {
 			area.html(`
