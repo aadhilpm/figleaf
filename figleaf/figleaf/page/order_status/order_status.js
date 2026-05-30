@@ -15,9 +15,10 @@ class OrderStatus {
 		this.selected_order = null;
 		this.refresh_interval = null;
 		this.make();
-		this.setup_filters();
-		this.refresh();
-		this.start_auto_refresh();
+		this.setup_filters().then(() => {
+			this.refresh();
+			this.start_auto_refresh();
+		});
 	}
 
 	make() {
@@ -37,7 +38,7 @@ class OrderStatus {
 		`);
 	}
 
-	setup_filters() {
+	async setup_filters() {
 		let filter_row = this.page.main.find('.filter-row');
 
 		this.filters = {};
@@ -51,6 +52,15 @@ class OrderStatus {
 			{ fieldname: 'billing_status', label: __('Billing Status'), fieldtype: 'Select', options: '\nNot Billed\nBilled', default: 'Not Billed' },
 		];
 
+		// Check user permission for Sales Person
+		let user_sales_person = frappe.defaults.get_user_permissions()['Sales Person'];
+		if (user_sales_person && user_sales_person.length) {
+			let sp = user_sales_person[0].doc;
+			let sp_config = filter_config.find(f => f.fieldname === 'sales_person');
+			sp_config.default = sp;
+			sp_config.read_only = 1;
+		}
+
 		filter_config.forEach(f => {
 			let wrapper = $(`<div class="filter-field"></div>`).appendTo(filter_row);
 			this.filters[f.fieldname] = frappe.ui.form.make_control({
@@ -60,6 +70,7 @@ class OrderStatus {
 					fieldname: f.fieldname,
 					options: f.options,
 					default: f.default,
+					read_only: f.read_only || 0,
 					change: () => {
 						this.selected_order = null;
 						this.refresh();
@@ -68,10 +79,14 @@ class OrderStatus {
 				parent: wrapper,
 				render_input: true
 			});
-			if (f.default) {
-				this.filters[f.fieldname].set_value(f.default);
-			}
 		});
+
+		// Set defaults before first refresh
+		for (let f of filter_config) {
+			if (f.default) {
+				await this.filters[f.fieldname].set_value(f.default);
+			}
+		}
 	}
 
 	get_filter_values() {
