@@ -51,22 +51,26 @@
    "options": "Stage"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
    "options": "Not Started\nProgress\nCompleted"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "start_time",
    "fieldtype": "Datetime",
    "label": "Start Time"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "end_time",
    "fieldtype": "Datetime",
    "label": "End Time"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "quantity_completed",
    "fieldtype": "Float",
    "label": "Quantity Completed"

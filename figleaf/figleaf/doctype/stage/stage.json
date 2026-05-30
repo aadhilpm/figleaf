@@ -6,7 +6,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "stage_name"
+  "stage_name",
+  "sequence"
  ],
  "fields": [
   {
@@ -15,6 +16,13 @@
    "fieldtype": "Data",
    "label": "Stage Name",
    "unique": 1
+  },
+  {
+   "allow_in_quick_entry": 1,
+   "fieldname": "sequence",
+   "fieldtype": "Int",
+   "label": "Sequence",
+   "default": "0"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -40,7 +48,7 @@
   }
  ],
  "quick_entry": 1,
- "sort_field": "modified",
- "sort_order": "DESC",
+ "sort_field": "sequence",
+ "sort_order": "ASC",
  "states": []
 }

@@ -46,7 +46,8 @@ app_license = "agpl-3.0"
 doctype_js = {
     "Opportunity": "public/js/opportunity.js",
     "Order Measurements": "public/js/order_measurements.js",
-    "Quotation": "overrides/quotation/custom_quotation.js"
+    "Quotation": "overrides/quotation/custom_quotation.js",
+    "Work Order": "public/js/work_order.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
