@@ -374,4 +374,10 @@ def get_conditions(filters):
 			AND st.sales_person = %(sales_person)s
 		)"""
 
+	if filters.get("billing_status"):
+		if filters["billing_status"] == "Not Billed":
+			conditions += " AND so.per_billed < 100"
+		elif filters["billing_status"] == "Billed":
+			conditions += " AND so.per_billed = 100"
+
 	return conditions

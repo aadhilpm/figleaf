@@ -48,6 +48,7 @@ class OrderStatus {
 			{ fieldname: 'from_date', label: __('From Date'), fieldtype: 'Date', default: frappe.datetime.add_months(frappe.datetime.get_today(), -1) },
 			{ fieldname: 'to_date', label: __('To Date'), fieldtype: 'Date', default: frappe.datetime.get_today() },
 			{ fieldname: 'sales_person', label: __('Sales Person'), fieldtype: 'Link', options: 'Sales Person' },
+			{ fieldname: 'billing_status', label: __('Billing Status'), fieldtype: 'Select', options: '\nNot Billed\nBilled', default: 'Not Billed' },
 		];
 
 		filter_config.forEach(f => {
