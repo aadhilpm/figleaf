@@ -85,7 +85,12 @@ class MeasurementAssignment(Document):
 	def sync_todo(self):
 		"""Mirror the assignment in the tailor's ToDo list (standard ERPNext notification)."""
 		try:
-			from frappe.desk.form.assign_to import add as assign_add
+			from frappe.desk.form import assign_to
+
+			def assign_add(args):
+				# v16: _add(args, ignore_permissions=...); v15: add(args, ignore_permissions=...)
+				fn = getattr(assign_to, "_add", None) or assign_to.add
+				return fn(args, ignore_permissions=True)
 
 			before = self.get_doc_before_save()
 			if before and before.assigned_to != self.assigned_to:
@@ -103,8 +108,7 @@ class MeasurementAssignment(Document):
 							"name": self.name,
 							"description": _("Take measurements: {0}").format(self.party_name),
 							"date": self.due_date,
-						},
-						ignore_permissions=True,
+						}
 					)
 			else:
 				close_todos(self.name, cancel=self.status == "Cancelled")
