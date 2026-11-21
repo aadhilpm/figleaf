@@ -31,6 +31,8 @@ class MeasurementAssignment(Document):
 		self.set_party()
 		if not self.garments:
 			self.fill_garments()
+		self.clean_people()
+		self.apply_people_progress()
 		if self.status == "Completed" and not self.completed_on:
 			self.completed_on = now_datetime()
 		if self.status in OPEN_STATUSES:
@@ -64,6 +66,47 @@ class MeasurementAssignment(Document):
 				self.party_name = frappe.db.get_value("Customer", self.customer, "customer_name")
 		if not self.party_name:
 			frappe.throw(_("Select the Sales Order, Quotation or Customer to measure for"))
+
+	def clean_people(self):
+		"""Trim names, drop blank rows, check per-person garments, refuse duplicates."""
+		seen = {}
+		keep = []
+		valid = {g.garment for g in self.garments}
+		for row in self.people:
+			row.person_name = (row.person_name or "").strip()
+			row.employee_code = (row.employee_code or "").strip() or None
+			if not row.person_name:
+				continue
+			key = person_key(row.person_name, row.employee_code)
+			if key in seen:
+				frappe.throw(
+					_("Row {0}: {1} is already on the list (row {2})").format(row.idx, row.person_name, seen[key])
+				)
+			seen[key] = row.idx
+			if row.garments:
+				names = [g.strip() for g in row.garments.split(",") if g.strip()]
+				unknown = [g for g in names if valid and g not in valid]
+				if unknown:
+					frappe.throw(
+						_("Row {0} ({1}): {2} is not one of the garments of this assignment").format(
+							row.idx, row.person_name, ", ".join(unknown)
+						)
+					)
+				row.garments = ", ".join(names)
+			keep.append(row)
+		if len(keep) != len(self.people):
+			self.set("people", keep)
+			for i, row in enumerate(self.people, 1):
+				row.idx = i
+		self.people_count = len(self.people)
+
+	def apply_people_progress(self):
+		if self.is_new() or not self.people:
+			return
+		matches = match_people(self.name, self.people)
+		for row in self.people:
+			row.measurement = matches.get(_row_id(row))
+			row.status = "Measured" if row.measurement else "Pending"
 
 	def fill_garments(self):
 		dt, name = (
@@ -147,9 +190,77 @@ def suggested_garments(doctype, name):
 	return list(out.items())
 
 
+def _row_id(row):
+	# rows added in this save have no name yet
+	return row.name or f"new-{row.idx}"
+
+
+def person_key(person_name, employee_code=None):
+	code = (employee_code or "").strip().lower()
+	return f"id:{code}" if code else "name:" + " ".join((person_name or "").lower().split())
+
+
+def match_people(assignment, people):
+	"""{person row name: Customer Measurement name} for the people on an assignment's list.
+	A measurement counts for a row when it was taken from that row in the app, otherwise when
+	the staff ID (or, without one, the name) is the same."""
+	if not people:
+		return {}
+	measured = frappe.get_all(
+		"Customer Measurement",
+		filters={"assignment": assignment},
+		fields=["name", "assignment_person", "person_name", "employee_code"],
+		order_by="creation asc",
+	)
+	out, used = {}, set()
+	by_row = {m.assignment_person: m.name for m in measured if m.assignment_person}
+	for row in people:
+		if row.name and row.name in by_row:
+			out[row.name] = by_row[row.name]
+			used.add(by_row[row.name])
+	# then by staff ID, or by name when one side has no staff ID
+	by_code, by_name, by_name_no_code = {}, {}, {}
+	for m in measured:
+		if m.name in used:
+			continue
+		name = person_key(m.person_name)
+		by_name.setdefault(name, m.name)
+		if (m.employee_code or "").strip():
+			by_code.setdefault(person_key(m.person_name, m.employee_code), m.name)
+		else:
+			by_name_no_code.setdefault(name, m.name)
+	for row in people:
+		if _row_id(row) in out:
+			continue
+		if (row.employee_code or "").strip():
+			m = by_code.get(person_key(row.person_name, row.employee_code)) or by_name_no_code.get(
+				person_key(row.person_name)
+			)
+		else:
+			m = by_name.get(person_key(row.person_name))
+		if m and m not in used:
+			out[_row_id(row)] = m
+			used.add(m)
+	return out
+
+
 def update_progress(name):
 	if not name or not frappe.db.exists("Measurement Assignment", name):
 		return
+	people = frappe.get_all(
+		"Measurement Assignment Person",
+		filters={"parent": name, "parenttype": "Measurement Assignment"},
+		fields=["name", "person_name", "employee_code", "status", "measurement"],
+	)
+	matches = match_people(name, people)
+	for row in people:
+		m = matches.get(row.name)
+		status = "Measured" if m else "Pending"
+		if (row.measurement or None) != m or row.status != status:
+			frappe.db.set_value(
+				"Measurement Assignment Person", row.name, {"measurement": m, "status": status},
+				update_modified=False,
+			)
 	count = frappe.db.count("Customer Measurement", {"assignment": name})
 	a = frappe.db.get_value("Measurement Assignment", name, ["status", "measured_count"], as_dict=True)
 	updates = {"measured_count": count}

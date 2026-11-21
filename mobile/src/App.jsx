@@ -34,7 +34,7 @@ const snap = (d) =>
     (d.values || []).filter((v) => v.value || v.notes).map((v) => [v.garment, v.measurement_type, v.value, v.notes]),
   ]);
 
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 const LOCK_AFTER_MS = 5 * 60 * 1000;
 const AUTO_SYNC_MS = 5 * 60 * 1000;
 
@@ -44,6 +44,7 @@ function blankDraft(base = {}) {
     app_uuid: null,
     name: null,
     assignment: "",
+    assignment_person: "",
     customer: "",
     customer_name: "",
     quotation: "",
@@ -284,9 +285,13 @@ export default function App() {
     push("details", { isNew: true });
   }
 
-  function measureFor(a) {
-    const gs = (a.garments || []).map((g) => g.garment).filter((g) => garments.some((x) => x.name === g));
-    newMeasurement({
+  // a: assignment; p: a person from its list (optional) -> straight to the measurements
+  function measureFor(a, p) {
+    const all = (a.garments || []).map((g) => g.garment).filter((g) => garments.some((x) => x.name === g));
+    const own = p && (p.garments || []).filter((g) => garments.some((x) => x.name === g));
+    const gs = own && own.length ? own : all;
+    const d = blankDraft({
+      unit: defaultUnit(),
       assignment: a.name,
       customer: a.customer || "",
       customer_name: a.party_name,
@@ -295,7 +300,19 @@ export default function App() {
       ref_no: a.sales_order || a.quotation || "",
       garments: gs,
       values: buildValues(gs, garments, []),
+      ...(p
+        ? {
+            assignment_person: p.row,
+            person_name: p.person_name || "",
+            employee_code: p.employee_code || "",
+            designation: p.designation || "",
+            gender: p.gender || "",
+          }
+        : {}),
     });
+    setDraft(d);
+    setDraftBase(snap(d));
+    push(p && gs.length ? "entry" : "details", { isNew: true });
   }
 
   async function markDone(name) {
@@ -343,7 +360,10 @@ export default function App() {
       await refreshPendingCount();
       showToast(online ? "Saved, syncing…" : "Saved on this phone, will sync when online");
       if (online) runSync();
-      if (nextPerson) {
+      const listed = rec.assignment ? (await db.assignments.get(rec.assignment))?.people || [] : [];
+      if (nextPerson && listed.length) {
+        setStack([{ screen: "home" }, { screen: "assignment", name: rec.assignment }]);
+      } else if (nextPerson) {
         const next = blankDraft({
             assignment: rec.assignment,
             customer: rec.customer,

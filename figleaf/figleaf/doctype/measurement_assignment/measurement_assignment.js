@@ -34,6 +34,14 @@ frappe.ui.form.on("Measurement Assignment", {
 			__("{0} people measured", [frm.doc.measured_count || 0]),
 			frm.doc.measured_count ? "green" : "gray"
 		);
+		const listed = (frm.doc.people || []).length;
+		if (listed) {
+			const done = frm.doc.people.filter((p) => p.status === "Measured").length;
+			frm.dashboard.add_indicator(
+				__("{0} of {1} on the list measured", [done, listed]),
+				done === listed ? "green" : "orange"
+			);
+		}
 	},
 
 	based_on(frm) {

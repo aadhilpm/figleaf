@@ -61,6 +61,7 @@ function toPayload(r) {
   return {
     app_uuid: r.id,
     assignment: r.assignment || null,
+    assignment_person: r.assignment ? r.assignment_person || null : null,
     party_name: r.assignment ? undefined : r.customer_name,
     person_name: r.person_name,
     employee_code: r.employee_code || null,

@@ -36,7 +36,13 @@ class CustomerMeasurement(Document):
 
 	def apply_assignment(self):
 		if not self.assignment:
+			self.assignment_person = None
 			return
+		if self.assignment_person and not frappe.db.exists(
+			"Measurement Assignment Person",
+			{"name": self.assignment_person, "parent": self.assignment, "parenttype": "Measurement Assignment"},
+		):
+			self.assignment_person = None  # row removed from the list, or another assignment
 		a = frappe.db.get_value(
 			"Measurement Assignment",
 			self.assignment,
@@ -269,6 +275,19 @@ def get_assignment_info(assignment):
 		"sales_order": a.sales_order,
 		"quotation": a.quotation,
 		"garments": [g.garment for g in a.garments],
+		"people": [
+			{
+				"row": p.name,
+				"person_name": p.person_name,
+				"employee_code": p.employee_code,
+				"designation": p.designation,
+				"gender": p.gender,
+				"garments": [g.strip() for g in (p.garments or "").split(",") if g.strip()],
+				"status": p.status,
+				"measurement": p.measurement,
+			}
+			for p in a.people
+		],
 	}
 
 

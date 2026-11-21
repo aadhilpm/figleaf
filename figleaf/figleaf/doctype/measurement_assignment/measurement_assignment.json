@@ -17,6 +17,8 @@
   "status",
   "section_garments",
   "garments",
+  "section_people",
+  "people",
   "section_visit",
   "contact_person",
   "contact_mobile",
@@ -26,6 +28,7 @@
   "notes",
   "section_progress",
   "measured_count",
+  "people_count",
   "column_break_progress",
   "completed_on"
  ],
@@ -136,6 +139,20 @@
    "description": "Filled from the order's items when left empty."
   },
   {
+   "fieldname": "section_people",
+   "fieldtype": "Section Break",
+   "label": "People to Measure",
+   "collapsible": 0
+  },
+  {
+   "fieldname": "people",
+   "fieldtype": "Table",
+   "label": "People",
+   "options": "Measurement Assignment Person",
+   "allow_bulk_edit": 1,
+   "description": "Optional. The tailor sees this list in the app and taps each person to measure. Use Upload to import from Excel. The tailor can still add people who are not on the list."
+  },
+  {
    "fieldname": "section_visit",
    "fieldtype": "Section Break",
    "label": "Visit"
@@ -183,6 +200,13 @@
    "no_copy": 1
   },
   {
+   "fieldname": "people_count",
+   "fieldtype": "Int",
+   "label": "People on List",
+   "read_only": 1,
+   "no_copy": 0
+  },
+  {
    "fieldname": "column_break_progress",
    "fieldtype": "Column Break"
   },
@@ -202,7 +226,7 @@
    "group": "Measurements"
   }
  ],
- "modified": "2026-11-21 10:00:00.000000",
+ "modified": "2026-11-21 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Figleaf",
  "name": "Measurement Assignment",

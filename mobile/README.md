@@ -17,6 +17,10 @@ Offline-first app for recording customer measurements into ERPNext. It talks to 
   cancelled or reassigned, it and its measurements are removed from the phone at the next sync. Synced
   walk-ins are removed after 3 days. If the user is disabled or their password changes, the phone keeps
   only measurements that were never sent.
+- **People list:** the office can list the people to measure on the assignment (name, staff ID,
+  designation, gender, and garments if fewer than the assignment's). The app shows the list as a
+  checklist: tap a person to go straight to their measurements, already filled in. "Add person" covers
+  anyone who is not on the list. Progress shows as "measured of listed" in the app and on the form.
 - **Walk-ins** (if allowed in Measurement Settings): the tailor types the customer name; the office links
   the record to a Customer later. The phone never creates customers.
 - **Copy previous:** within the same assignment on the phone, or, while online, the server returns that

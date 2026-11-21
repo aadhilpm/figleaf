@@ -35,6 +35,9 @@ frappe.ui.form.on("Customer Measurement", {
 		}
 		load_garments(frm).then(() => render_panel(frm));
 
+		if (frm.doc.assignment) {
+			frm.add_custom_button(__("Pick Person"), () => pick_person(frm));
+		}
 		if (frm.doc.customer) {
 			frm.add_custom_button(__("Copy Previous"), () => copy_previous(frm), __("Actions"));
 		}
@@ -58,10 +61,12 @@ frappe.ui.form.on("Customer Measurement", {
 	},
 
 	assignment(frm) {
+		frm.doc.assignment_person = "";
 		if (!frm.doc.assignment) return;
 		frappe.call(`${CM_METHOD}.get_assignment_info`, { assignment: frm.doc.assignment }).then((r) => {
 			const a = r.message;
 			if (!a) return;
+			frm.cm.assignment = a;
 			// set directly: tailors cannot read Customer / Sales Order, the server re-checks on save
 			Object.assign(frm.doc, {
 				customer: a.customer || "",
@@ -75,7 +80,18 @@ frappe.ui.form.on("Customer Measurement", {
 			if (!(frm.doc.garments || []).length && a.garments.length) {
 				frm.set_value("garments", a.garments.map((g) => ({ garment: g }))).then(() => sync_rows(frm));
 			}
+			frm.refresh();
+			if (frm.is_new() && !frm.doc.person_name && a.people.some((p) => p.status !== "Measured")) {
+				pick_person(frm, a);
+			}
 		});
+	},
+
+	person_name(frm) {
+		// typed a different name after picking: no longer that person on the list
+		const a = frm.cm.assignment;
+		const row = a && frm.doc.assignment_person && (a.people || []).find((p) => p.row === frm.doc.assignment_person);
+		if (row && row.person_name !== frm.doc.person_name) frm.doc.assignment_person = "";
 	},
 
 	customer(frm) {
@@ -456,8 +472,76 @@ function next_person(frm) {
 			const f = cur_frm;
 			if (f && f.doc.name === doc.name) {
 				sync_rows(f);
-				setTimeout(() => f.get_field("person_name").$input && f.get_field("person_name").$input.focus(), 300);
+				if (f.doc.assignment) {
+					pick_person(f, null, true);
+				} else {
+					setTimeout(() => f.get_field("person_name").$input && f.get_field("person_name").$input.focus(), 300);
+				}
 			}
 		});
+	});
+}
+
+// People listed on the assignment: pick one to fill name, staff ID, designation, gender and garments.
+function pick_person(frm, info, quiet) {
+	const load = info
+		? Promise.resolve(info)
+		: frappe
+				.call(`${CM_METHOD}.get_assignment_info`, { assignment: frm.doc.assignment })
+				.then((r) => r.message);
+	load.then((a) => {
+		if (!a) return;
+		frm.cm.assignment = a;
+		const pending = (a.people || []).filter((p) => p.status !== "Measured");
+		if (!pending.length) {
+			if (!quiet) {
+				frappe.msgprint(
+					(a.people || []).length
+						? __("Everyone on this assignment's list is measured. Type the name to add someone else.")
+						: __("This assignment has no list of people. Type the person's name.")
+				);
+			}
+			const inp = frm.get_field("person_name").$input;
+			if (inp) setTimeout(() => inp.focus(), 300);
+			return;
+		}
+		const label = (p) =>
+			[p.person_name, p.employee_code, p.designation].filter(Boolean).join(" · ");
+		const d = new frappe.ui.Dialog({
+			title: __("Pick Person ({0} still to measure)", [pending.length]),
+			fields: [
+				{
+					fieldname: "person",
+					fieldtype: "Autocomplete",
+					label: __("Person"),
+					reqd: 1,
+					options: pending.map((p) => ({ label: label(p), value: p.row })),
+				},
+			],
+			primary_action_label: __("Select"),
+			primary_action(v) {
+				const p = pending.find((x) => x.row === v.person);
+				if (!p) return;
+				d.hide();
+				frm.doc.assignment_person = p.row;
+				frm.set_value({
+					person_name: p.person_name,
+					employee_code: p.employee_code || "",
+					designation: p.designation || "",
+					gender: p.gender || frm.doc.gender || "",
+				});
+				if (p.garments.length) {
+					frm.set_value("garments", p.garments.map((g) => ({ garment: g }))).then(() => sync_rows(frm));
+				}
+			},
+			secondary_action_label: __("Someone Not on the List"),
+			secondary_action() {
+				d.hide();
+				frm.doc.assignment_person = "";
+				const inp = frm.get_field("person_name").$input;
+				if (inp) setTimeout(() => inp.focus(), 300);
+			},
+		});
+		d.show();
 	});
 }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db } from "../lib/db.js";
+import { db, matchListed } from "../lib/db.js";
 import { onSyncState } from "../lib/sync.js";
 import { Icon, Sheet, StatusPill, TopBar, fmtDate, timeAgo } from "../components/ui.jsx";
 
@@ -119,7 +119,9 @@ export function HomeScreen({ account, online, config, onOpenAssignment, onNewFor
                   <div className="meta">{garmentSummary(a) || "Garments not set"}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div className="pill synced" style={{ display: "inline-block" }}>{counts[a.name] || 0} done</div>
+                  <div className="pill synced" style={{ display: "inline-block" }}>
+                    {(a.people || []).length ? `${counts[a.name] || 0} / ${a.people.length}` : `${counts[a.name] || 0} done`}
+                  </div>
                   {isOverdue(a.due_date) ? <div className="pill error" style={{ display: "inline-block", marginTop: 6 }}>Overdue</div> : null}
                 </div>
               </button>
@@ -209,6 +211,10 @@ export function AssignmentScreen({ name, online, onBack, onMeasure, onOpen, onMa
   const [confirm, setConfirm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [q, setQ] = useState("");
+  const [show, setShow] = useState("todo");
+  const listed = a?.people || [];
+  const matched = useMemo(() => matchListed(listed, people || []), [listed, people]);
 
   if (!a)
     return (
@@ -222,6 +228,29 @@ export function AssignmentScreen({ name, online, onBack, onMeasure, onOpen, onMa
 
   const sorted = [...(people || [])].sort((x, y) => x.person_name.localeCompare(y.person_name));
   const pending = sorted.filter((p) => p.status !== "synced").length;
+  const onList = new Set([...matched.values()].map((m) => m.rec?.id).filter(Boolean));
+  const others = listed.length ? sorted.filter((r) => !onList.has(r.id)) : sorted;
+  const doneCount = listed.filter((p) => matched.get(p.row)?.done).length;
+  const term = q.trim().toLowerCase();
+  const shown = listed.filter((p) => {
+    const done = !!matched.get(p.row)?.done;
+    if (show === "todo" && done) return false;
+    if (show === "done" && !done) return false;
+    return !term || [p.person_name, p.employee_code, p.designation].some((v) => String(v || "").toLowerCase().includes(term));
+  });
+
+  const recRow = (r) => (
+    <button key={r.id} className="row" onClick={() => onOpen(r.id)}>
+      <div className="grow">
+        <div className="title">
+          {r.person_name}
+          {r.employee_code ? <span className="small"> · {r.employee_code}</span> : null}
+        </div>
+        <div className="meta">{[r.designation, (r.garments || []).join(", ")].filter(Boolean).join(" · ")}</div>
+      </div>
+      <StatusPill rec={r} />
+    </button>
+  );
 
   return (
     <div className="screen">
@@ -254,24 +283,69 @@ export function AssignmentScreen({ name, online, onBack, onMeasure, onOpen, onMa
           ))}
         </div>
 
-        <div className="section-label">People measured ({sorted.length})</div>
-        {sorted.length === 0 ? (
-          <div className="card small">Nobody measured yet.</div>
+        {listed.length ? (
+          <>
+            <div className="section-label">
+              People to measure ({doneCount} of {listed.length} done)
+            </div>
+            <div className="progress"><span style={{ width: `${Math.round((doneCount / listed.length) * 100)}%` }} /></div>
+            {listed.length > 8 ? (
+              <input className="input" placeholder="Search name, staff ID, designation" value={q} onChange={(e) => setQ(e.target.value)} />
+            ) : null}
+            <div className="chips" style={{ margin: "10px 0" }}>
+              {[
+                ["todo", `To measure (${listed.length - doneCount})`],
+                ["done", `Done (${doneCount})`],
+                ["all", "All"],
+              ].map(([k, l]) => (
+                <button key={k} className={"chip" + (show === k ? " on" : "")} onClick={() => setShow(k)}>
+                  {l}
+                </button>
+              ))}
+            </div>
+            {shown.length === 0 ? (
+              <div className="card small">
+                {show === "todo" && !term ? "Everyone on the list is measured." : "Nobody matches."}
+              </div>
+            ) : (
+              <div className="list">
+                {shown.map((p) => {
+                  const m = matched.get(p.row);
+                  const garmentsText = (p.garments || []).length ? p.garments.join(", ") : "";
+                  return (
+                    <button
+                      key={p.row}
+                      className={"row person" + (m?.done ? " done" : "")}
+                      onClick={() => (m?.rec ? onOpen(m.rec.id) : m?.done ? null : onMeasure(a, p))}
+                    >
+                      <span className={"tick" + (m?.done ? " on" : "")}>{m?.done ? <Icon name="check" width="16" height="16" /> : null}</span>
+                      <div className="grow">
+                        <div className="title">
+                          {p.person_name}
+                          {p.employee_code ? <span className="small"> · {p.employee_code}</span> : null}
+                        </div>
+                        <div className="meta">
+                          {[p.designation, p.gender, garmentsText].filter(Boolean).join(" · ") || "\u00a0"}
+                        </div>
+                      </div>
+                      {m?.rec ? <StatusPill rec={m.rec} /> : m?.done ? <span className="pill synced">Measured</span> : <Icon name="chevron" width="20" height="20" />}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {others.length ? (
+              <>
+                <div className="section-label">Others measured, not on the list ({others.length})</div>
+                <div className="list">{others.map(recRow)}</div>
+              </>
+            ) : null}
+          </>
         ) : (
-          <div className="list">
-            {sorted.map((r) => (
-              <button key={r.id} className="row" onClick={() => onOpen(r.id)}>
-                <div className="grow">
-                  <div className="title">
-                    {r.person_name}
-                    {r.employee_code ? <span className="small"> · {r.employee_code}</span> : null}
-                  </div>
-                  <div className="meta">{[r.designation, (r.garments || []).join(", ")].filter(Boolean).join(" · ")}</div>
-                </div>
-                <StatusPill rec={r} />
-              </button>
-            ))}
-          </div>
+          <>
+            <div className="section-label">People measured ({sorted.length})</div>
+            {sorted.length === 0 ? <div className="card small">Nobody measured yet.</div> : <div className="list">{sorted.map(recRow)}</div>}
+          </>
         )}
         {err ? <div className="err-text" style={{ marginTop: 12 }}>{err}</div> : null}
       </div>
@@ -280,7 +354,7 @@ export function AssignmentScreen({ name, online, onBack, onMeasure, onOpen, onMa
           Mark done
         </button>
         <button className="btn" onClick={() => onMeasure(a)}>
-          <Icon name="plus" width="20" height="20" /> Measure a person
+          <Icon name="plus" width="20" height="20" /> {listed.length ? "Add person" : "Measure a person"}
         </button>
       </div>
       {confirm ? (

@@ -10,3 +10,4 @@ figleaf.patches.seed_staff_payable_settings
 figleaf.patches.seed_measurement_masters
 figleaf.patches.seed_measurement_units
 figleaf.patches.remove_measurement_user_select_perms
+figleaf.patches.set_fig_leaf_workspace_module

@@ -6,6 +6,7 @@
  "field_order": [
   "naming_series",
   "assignment",
+  "assignment_person",
   "customer",
   "party_name",
   "customer_name",
@@ -51,6 +52,15 @@
    "label": "Assignment",
    "options": "Measurement Assignment",
    "in_standard_filter": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "assignment_person",
+   "fieldtype": "Data",
+   "label": "Assignment Person Row",
+   "hidden": 1,
+   "read_only": 1,
+   "no_copy": 1,
    "search_index": 1
   },
   {
@@ -230,7 +240,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-11-21 10:00:00.000000",
+ "modified": "2026-11-21 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Figleaf",
  "name": "Customer Measurement",

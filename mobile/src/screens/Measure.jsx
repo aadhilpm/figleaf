@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { db, findPrevious, personKey } from "../lib/db.js";
+import { db, findPrevious, matchListed, personKey } from "../lib/db.js";
 import { api } from "../lib/api.js";
 import { buildPrintHtml, printHtml } from "../lib/print.js";
 import { Diagram, Field, Icon, Segmented, Sheet, StatusPill, TopBar, fmtDate } from "../components/ui.jsx";
@@ -51,13 +51,28 @@ export function DetailsScreen({ draft, setDraft, garments, config, onBack, onNex
     [draft.assignment, draft.customer_name, draft.id],
     []
   );
+  // people on the assignment's list who are not measured yet
+  const listed = useLiveQuery(
+    async () => {
+      if (!draft.assignment) return [];
+      const a = await db.assignments.get(draft.assignment);
+      if (!a?.people?.length) return [];
+      const recs = await db.measurements.where("assignment").equals(draft.assignment).filter((r) => r.id !== draft.id).toArray();
+      const m = matchListed(a.people, recs);
+      return a.people.filter((p) => !m.get(p.row)?.done);
+    },
+    [draft.assignment, draft.id],
+    []
+  );
   const [showPeople, setShowPeople] = useState(false);
   const matches = useMemo(() => {
     const t = draft.person_name.trim().toLowerCase();
-    return (people || [])
-      .filter((p) => !t || p.person_name.toLowerCase().includes(t) || (p.employee_code || "").toLowerCase().includes(t))
-      .slice(0, 6);
-  }, [people, draft.person_name]);
+    const hit = (p) => !t || p.person_name.toLowerCase().includes(t) || (p.employee_code || "").toLowerCase().includes(t);
+    return [
+      ...(listed || []).filter(hit).map((p) => ({ ...p, person_key: `list:${p.row}`, listed: true })),
+      ...(people || []).filter(hit),
+    ].slice(0, 8);
+  }, [people, listed, draft.person_name]);
 
   function toggleGarment(g) {
     const has = draft.garments.includes(g);
@@ -113,7 +128,7 @@ export function DetailsScreen({ draft, setDraft, garments, config, onBack, onNex
             className="input"
             value={draft.person_name}
             onChange={(e) => {
-              set({ person_name: e.target.value });
+              set({ person_name: e.target.value, assignment_person: "" });
               setShowPeople(true);
             }}
             onFocus={() => setShowPeople(true)}
@@ -125,7 +140,9 @@ export function DetailsScreen({ draft, setDraft, garments, config, onBack, onNex
         </Field>
         {showPeople && matches.length ? (
           <div className="list" style={{ marginTop: -6, marginBottom: 14 }}>
-            <div className="small" style={{ padding: "8px 16px 0" }}>Measured before for this customer</div>
+            <div className="small" style={{ padding: "8px 16px 0" }}>
+              {listed?.length ? "On the list, or measured before" : "Measured before for this customer"}
+            </div>
             {matches.map((p) => (
               <button
                 key={p.person_key}
@@ -133,12 +150,16 @@ export function DetailsScreen({ draft, setDraft, garments, config, onBack, onNex
                 className="row"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => {
-                  set({
+                  const patch = {
                     person_name: p.person_name,
                     employee_code: p.employee_code || "",
                     designation: p.designation || "",
                     gender: p.gender || draft.gender,
-                  });
+                    assignment_person: p.listed ? p.row : "",
+                  };
+                  const own = p.listed ? (p.garments || []).filter((g) => garments.some((x) => x.name === g)) : [];
+                  if (own.length) Object.assign(patch, { garments: own, values: buildValues(own, garments, draft.values) });
+                  set(patch);
                   setShowPeople(false);
                 }}
               >
@@ -148,7 +169,9 @@ export function DetailsScreen({ draft, setDraft, garments, config, onBack, onNex
                     {p.employee_code ? <span className="small"> · {p.employee_code}</span> : null}
                   </div>
                   <div className="meta">
-                    {[p.designation, (p.garments || []).join(", "), fmtDate(p.measurement_date)].filter(Boolean).join(" · ")}
+                    {p.listed
+                      ? ["On the list", p.designation].filter(Boolean).join(" · ")
+                      : [p.designation, (p.garments || []).join(", "), fmtDate(p.measurement_date)].filter(Boolean).join(" · ")}
                   </div>
                 </div>
               </button>

@@ -156,6 +156,19 @@ def _assignment_dict(name):
 		"location": a.location,
 		"notes": a.notes,
 		"garments": [{"garment": g.garment, "qty": g.qty} for g in a.garments],
+		"people": [
+			{
+				"row": p.name,
+				"person_name": p.person_name,
+				"employee_code": p.employee_code,
+				"designation": p.designation,
+				"gender": p.gender,
+				"garments": [g.strip() for g in (p.garments or "").split(",") if g.strip()],
+				"status": p.status,
+				"measurement": p.measurement,
+			}
+			for p in a.people
+		],
 		"measured_count": a.measured_count,
 		"modified": str(a.modified),
 	}
@@ -246,7 +259,7 @@ def set_assignment_status(assignment, status):
 def push_measurements(records, device_id=None):
 	"""Create or update measurements recorded on the phone.
 
-	Each record: {app_uuid, assignment | party_name (walk-in), person_name, employee_code, designation,
+	Each record: {app_uuid, assignment | party_name (walk-in), assignment_person, person_name, employee_code, designation,
 	gender, measurement_date, ref_no, unit, remarks, garments: [..],
 	values: [{garment, measurement_type, value, notes}], base_modified}
 	"""
@@ -307,6 +320,9 @@ def _upsert(rec, device_id):
 		if a.status == "Cancelled":
 			frappe.throw(_("Assignment {0} was cancelled").format(assignment))
 		doc.assignment = assignment
+		# row on the assignment's people list; Customer Measurement.validate drops it if it is not
+		if "assignment_person" in rec:
+			doc.assignment_person = rec.get("assignment_person") or None
 	else:
 		if not get_entry_config()["settings"].allow_walk_in:
 			frappe.throw(_("Walk-in measurements are turned off. Ask the office for an assignment."))
@@ -347,6 +363,7 @@ def _to_dict(doc):
 		"name": doc.name,
 		"app_uuid": doc.app_uuid,
 		"assignment": doc.assignment,
+		"assignment_person": doc.assignment_person,
 		"customer": doc.customer,
 		"customer_name": doc.customer_name or doc.party_name,
 		"party_name": doc.party_name,

@@ -52,6 +52,43 @@ export function personKey(employee_code, person_name) {
   return String(employee_code || person_name || "").trim().toLowerCase();
 }
 
+const norm = (s) => String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
+
+/**
+ * People listed on an assignment -> their measurement on this phone (or the server's).
+ * Returns Map(row -> { rec, done }). A record counts for a row when it was taken from that
+ * row, otherwise when the staff ID (or, without one, the name) matches. Mirrors the server.
+ */
+export function matchListed(people, records) {
+  const out = new Map();
+  const used = new Set();
+  const rows = new Set((people || []).map((p) => p.row));
+  (people || []).forEach((p) => {
+    const rec = (records || []).find((r) => r.assignment_person === p.row);
+    if (rec) {
+      out.set(p.row, { rec, done: true });
+      used.add(rec.id);
+    }
+  });
+  const free = (records || []).filter((r) => !used.has(r.id) && !(r.assignment_person && rows.has(r.assignment_person)));
+  (people || []).forEach((p) => {
+    if (out.has(p.row)) return;
+    const code = norm(p.employee_code);
+    const rec = free.find(
+      (r) =>
+        !used.has(r.id) &&
+        (code
+          ? norm(r.employee_code) === code || (!norm(r.employee_code) && norm(r.person_name) === norm(p.person_name))
+          : norm(r.person_name) === norm(p.person_name))
+    );
+    if (rec) {
+      used.add(rec.id);
+      out.set(p.row, { rec, done: true });
+    } else if (p.status === "Measured") out.set(p.row, { rec: null, done: true });
+  });
+  return out;
+}
+
 export function uuid() {
   if (globalThis.crypto?.randomUUID) return crypto.randomUUID();
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -73,6 +110,7 @@ export function fromServer(rec, extra = {}) {
     app_uuid: rec.app_uuid || null,
     name: rec.name,
     assignment: rec.assignment || "",
+    assignment_person: rec.assignment_person || "",
     customer: rec.customer || "",
     customer_name: rec.customer_name || rec.party_name || rec.customer,
     party_name: rec.party_name || "",
