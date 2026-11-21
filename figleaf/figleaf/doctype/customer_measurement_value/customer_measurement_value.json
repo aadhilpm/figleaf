@@ -1,0 +1,61 @@
+{
+ "actions": [],
+ "creation": "2026-11-21 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "garment",
+  "measurement_type",
+  "value",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "garment",
+   "fieldtype": "Link",
+   "label": "Garment",
+   "options": "Garment Template",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 2,
+   "read_only": 1
+  },
+  {
+   "fieldname": "measurement_type",
+   "fieldtype": "Link",
+   "label": "Measurement",
+   "options": "Measurement Type",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 3,
+   "read_only": 1
+  },
+  {
+   "fieldname": "value",
+   "fieldtype": "Data",
+   "label": "Value / Size",
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Data",
+   "label": "Notes",
+   "in_list_view": 1,
+   "columns": 3
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-11-21 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Figleaf",
+ "name": "Customer Measurement Value",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "istable": 1,
+ "editable_grid": 1
+}

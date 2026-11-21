@@ -1,0 +1,13 @@
+{
+  "appId": "com.badeeltechnology.measure",
+  "appName": "Measurement Entry",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

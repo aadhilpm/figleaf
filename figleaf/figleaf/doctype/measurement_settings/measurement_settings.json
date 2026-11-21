@@ -1,0 +1,133 @@
+{
+ "actions": [],
+ "creation": "2026-11-21 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "help_html",
+  "section_units",
+  "default_unit",
+  "column_break_units",
+  "allow_unit_change",
+  "section_rules",
+  "require_staff_id",
+  "column_break_rules",
+  "allow_walk_in"
+ ],
+ "fields": [
+  {
+   "fieldname": "help_html",
+   "fieldtype": "HTML",
+   "options": "<p class='text-muted small'>Rules for recording customer measurements in ERPNext and in the Measurement Entry mobile app. Garments and their measurements are set up in <a href='/app/garment-template'>Garment Template</a>, measurement names in <a href='/app/measurement-type'>Measurement Type</a> and units in <a href='/app/measurement-unit'>Measurement Unit</a>. Phones pick up changes on their next sync.</p>"
+  },
+  {
+   "fieldname": "section_units",
+   "fieldtype": "Section Break",
+   "label": "Units"
+  },
+  {
+   "fieldname": "default_unit",
+   "fieldtype": "Link",
+   "label": "Default Unit",
+   "options": "Measurement Unit",
+   "reqd": 1,
+   "description": "Used when a garment template has no unit of its own."
+  },
+  {
+   "fieldname": "column_break_units",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "allow_unit_change",
+   "fieldtype": "Check",
+   "label": "Allow Unit Change While Measuring",
+   "default": "1",
+   "description": "If unchecked, every measurement uses the garment template's unit (or the default unit)."
+  },
+  {
+   "fieldname": "section_rules",
+   "fieldtype": "Section Break",
+   "label": "Entry Rules"
+  },
+  {
+   "fieldname": "require_staff_id",
+   "fieldtype": "Check",
+   "label": "Staff ID is Mandatory"
+  },
+  {
+   "fieldname": "column_break_rules",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "allow_walk_in",
+   "fieldtype": "Check",
+   "label": "Allow Walk-in Measurements in the App",
+   "default": "1",
+   "description": "Tailors may record a measurement without an assignment by typing the customer name. The office links it to a Customer later."
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-11-21 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Figleaf",
+ "name": "Measurement Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "print": 1,
+   "email": 1,
+   "export": 1,
+   "report": 1,
+   "share": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "Sales Manager",
+   "read": 1,
+   "print": 1,
+   "email": 1,
+   "export": 1,
+   "report": 1,
+   "share": 1,
+   "write": 1,
+   "create": 1
+  },
+  {
+   "role": "Sales User",
+   "read": 1,
+   "print": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Measurement User",
+   "read": 1,
+   "print": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Manufacturing User",
+   "read": 1,
+   "print": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Manufacturing Manager",
+   "read": 1,
+   "print": 1,
+   "report": 1,
+   "export": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "issingle": 1,
+ "track_changes": 1
+}

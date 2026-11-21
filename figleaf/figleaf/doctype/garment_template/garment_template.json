@@ -1,0 +1,151 @@
+{
+ "actions": [],
+ "creation": "2026-11-21 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "garment_name",
+  "default_unit",
+  "diagram",
+  "column_break_1",
+  "disabled",
+  "diagram_image",
+  "section_measurements",
+  "measurements",
+  "section_items",
+  "items"
+ ],
+ "fields": [
+  {
+   "fieldname": "garment_name",
+   "fieldtype": "Data",
+   "label": "Garment",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "default_unit",
+   "fieldtype": "Link",
+   "label": "Default Unit",
+   "options": "Measurement Unit",
+   "description": "Unit suggested when this garment is measured. Leave empty to use Measurement Settings."
+  },
+  {
+   "fieldname": "diagram",
+   "fieldtype": "Select",
+   "label": "Diagram",
+   "options": "Top\nTop Sleeveless\nLong Coat\nBottom\nFull Body",
+   "default": "Top",
+   "description": "Built-in garment drawing shown while entering measurements."
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "fieldname": "diagram_image",
+   "fieldtype": "Attach Image",
+   "label": "Custom Diagram Image",
+   "description": "Optional. Replaces the built-in drawing with your own image."
+  },
+  {
+   "fieldname": "section_measurements",
+   "fieldtype": "Section Break",
+   "label": "Measurements",
+   "description": "Measurements recorded for this garment, in the order they are taken."
+  },
+  {
+   "fieldname": "measurements",
+   "fieldtype": "Table",
+   "label": "Measurements",
+   "options": "Garment Template Measurement",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_items",
+   "fieldtype": "Section Break",
+   "label": "Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table MultiSelect",
+   "label": "Items",
+   "options": "Garment Template Item",
+   "description": "Sales items made to this garment's measurements. Used to suggest garments from a Sales Order."
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-11-21 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Figleaf",
+ "name": "Garment Template",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "print": 1,
+   "email": 1,
+   "export": 1,
+   "report": 1,
+   "share": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  },
+  {
+   "role": "Sales Manager",
+   "read": 1,
+   "print": 1,
+   "email": 1,
+   "export": 1,
+   "report": 1,
+   "share": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1
+  },
+  {
+   "role": "Sales User",
+   "read": 1,
+   "print": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Measurement User",
+   "read": 1,
+   "print": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Manufacturing User",
+   "read": 1,
+   "print": 1,
+   "report": 1,
+   "export": 1
+  },
+  {
+   "role": "Manufacturing Manager",
+   "read": 1,
+   "print": 1,
+   "report": 1,
+   "export": 1
+  }
+ ],
+ "sort_field": "garment_name",
+ "sort_order": "ASC",
+ "states": [],
+ "allow_rename": 1,
+ "autoname": "field:garment_name",
+ "naming_rule": "By fieldname",
+ "track_changes": 1
+}

@@ -1,0 +1,139 @@
+{
+ "app": "figleaf",
+ "charts": [],
+ "content": "[{\"id\": \"mh1\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Measurements</b></span>\", \"col\": 12}}, {\"id\": \"ms1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"New Measurement\", \"col\": 3}}, {\"id\": \"ms2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Customer Measurement\", \"col\": 3}}, {\"id\": \"ms3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Measurement Sheet\", \"col\": 3}}, {\"id\": \"ms4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Measurement Settings\", \"col\": 3}}, {\"id\": \"msp\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"mc1\", \"type\": \"card\", \"data\": {\"card_name\": \"Setup\", \"col\": 4}}, {\"id\": \"mc2\", \"type\": \"card\", \"data\": {\"card_name\": \"Records\", \"col\": 4}}]",
+ "creation": "2026-11-21 12:00:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "list",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "Measurements",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Setup",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Measurement Settings",
+   "link_count": 0,
+   "link_to": "Measurement Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Garment Template",
+   "link_count": 0,
+   "link_to": "Garment Template",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Measurement Type",
+   "link_count": 0,
+   "link_to": "Measurement Type",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Measurement Unit",
+   "link_count": 0,
+   "link_to": "Measurement Unit",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Records",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Customer Measurement",
+   "link_count": 0,
+   "link_to": "Customer Measurement",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Measurement Sheet",
+   "link_count": 0,
+   "link_to": "Measurement Sheet",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-11-21 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Figleaf",
+ "name": "Measurements",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 30.0,
+ "shortcuts": [
+  {
+   "color": "Orange",
+   "doc_view": "New",
+   "label": "New Measurement",
+   "link_to": "Customer Measurement",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Customer Measurement",
+   "link_to": "Customer Measurement",
+   "type": "DocType"
+  },
+  {
+   "color": "Blue",
+   "doc_view": "",
+   "label": "Measurement Sheet",
+   "link_to": "Measurement Sheet",
+   "type": "Report",
+   "report_ref_doctype": "Customer Measurement"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "",
+   "label": "Measurement Settings",
+   "link_to": "Measurement Settings",
+   "type": "DocType"
+  }
+ ],
+ "title": "Measurements"
+}

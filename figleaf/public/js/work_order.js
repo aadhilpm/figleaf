@@ -1,5 +1,17 @@
 frappe.ui.form.on("Work Order", {
 	refresh(frm) {
+		if (frm.doc.sales_order) {
+			frm.add_custom_button(__("Measurement Sheet"), () => {
+				frappe.db
+					.get_value("Garment Template Item", { item: frm.doc.production_item, parenttype: "Garment Template" }, "parent")
+					.then(({ message }) =>
+						frappe.set_route("query-report", "Measurement Sheet", {
+							sales_order: frm.doc.sales_order,
+							garment: message && message.parent,
+						})
+					);
+			});
+		}
 		if (frm.doc.docstatus !== 1) return;
 
 		frappe.call({

@@ -45,8 +45,8 @@ app_license = "agpl-3.0"
 # include js in doctype views
 doctype_js = {
     "Opportunity": "public/js/opportunity.js",
-    "Order Measurements": "public/js/order_measurements.js",
-    "Quotation": "overrides/quotation/custom_quotation.js",
+    "Quotation": ["overrides/quotation/custom_quotation.js", "public/js/quotation_measurement.js"],
+    "Sales Order": "public/js/sales_order.js",
     "Work Order": "public/js/work_order.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -250,3 +250,26 @@ override_doctype_class = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+override_doctype_dashboards = {
+	"Sales Order": "figleaf.overrides.dashboards.measurements.sales_order",
+	"Customer": "figleaf.overrides.dashboards.measurements.customer",
+	"Quotation": "figleaf.overrides.dashboards.measurements.quotation",
+}
+
+# Tailors (Measurement User only) see just their own assignments and measurements
+permission_query_conditions = {
+	"Customer Measurement": "figleaf.figleaf.doctype.customer_measurement.customer_measurement.get_permission_query_conditions",
+	"Measurement Assignment": "figleaf.figleaf.doctype.measurement_assignment.measurement_assignment.get_permission_query_conditions",
+}
+
+has_permission = {
+	"Customer Measurement": "figleaf.figleaf.doctype.customer_measurement.customer_measurement.has_permission",
+	"Measurement Assignment": "figleaf.figleaf.doctype.measurement_assignment.measurement_assignment.has_permission",
+}
+
+doc_events = {
+	"Sales Order": {
+		# measurements taken against a quotation move to the confirmed order
+		"on_submit": "figleaf.figleaf.doctype.customer_measurement.customer_measurement.link_quotation_measurements",
+	},
+}
