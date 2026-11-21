@@ -10,16 +10,25 @@ app_license = "agpl-3.0"
 
 # required_apps = []
 
-# Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "figleaf",
-# 		"logo": "/assets/figleaf/logo.png",
-# 		"title": "Figleaf",
-# 		"route": "/figleaf",
-# 		"has_permission": "figleaf.api.permission.has_app_permission"
-# 	}
-# ]
+# Each item in the list will be shown as an app in the apps page (v16 desk home)
+def _desk_route(slug):
+	import frappe
+
+	# v16 serves the desk at /desk, v15 at /app
+	major = int((frappe.__version__ or "15").split(".")[0])
+	return f"/desk/{slug}" if major >= 16 else f"/app/{slug}"
+
+
+add_to_apps_screen = [
+	{
+		"name": "figleaf",
+		"logo": "/assets/figleaf/images/figleaf-logo.svg",
+		"title": "Fig Leaf",
+		"route": _desk_route("fig-leaf"),
+		"has_permission": "figleaf.api.permission.has_app_permission",
+		"sequence_id": 0,
+	}
+]
 
 # Includes in <head>
 # ------------------
