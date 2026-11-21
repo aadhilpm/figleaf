@@ -34,6 +34,11 @@ SKIP_MARKERS = ["/RM", "/ RM", "/STD", "/ STD", "SERVICE"]
 
 
 def execute():
+	# units must exist first: Garment Template.default_unit links to Measurement Unit
+	from figleaf.patches.seed_measurement_units import execute as seed_units
+
+	seed_units()
+
 	for m in dict.fromkeys(sum([g[2] for g in GARMENTS], [])):
 		if not frappe.db.exists("Measurement Type", m):
 			frappe.get_doc({"doctype": "Measurement Type", "measurement_type": m}).insert(ignore_permissions=True)
